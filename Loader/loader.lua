@@ -1,12 +1,11 @@
 -- ZeroHub Loader v6.0 | Remote config via npoint.io
-local CONFIG_URL = "https://api.npoint.io/e00fe3bb6747ca25eef5"  -- ← paste your npoint URL here
+local CONFIG_URL = "https://api.npoint.io/e00fe3bb6747ca25eef5"
 
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
-local currentVersion = ""  -- will be set later
 
--- ========== LOADING GUI (same clean animation) ==========
+-- ========== LOADING GUI ==========
 local loader = Instance.new("ScreenGui", CoreGui)
 loader.Name = "ZeroHub_Loader"
 
@@ -60,7 +59,7 @@ statusText.Visible = false
 
 -- ========== ANIMATION & FETCH LOGIC ==========
 task.spawn(function()
-    -- Pulse orb
+    -- Pulsing orb
     local orbIn = TweenService:Create(orb, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundTransparency = 0.6})
     local orbOut = TweenService:Create(orb, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {BackgroundTransparency = 0.9})
     orbIn:Play()
@@ -72,7 +71,7 @@ task.spawn(function()
     TweenService:Create(logo, TweenInfo.new(0.8), {TextTransparency = 0}):Play()
     task.wait(1.2)
 
-    -- Spin & colour shift
+    -- Spin + colour shift
     TweenService:Create(logo, TweenInfo.new(1.0, Enum.EasingStyle.Quad), {Rotation = 360, TextColor3 = Color3.fromRGB(120,0,255)}):Play()
     task.wait(1.0)
     logo.Rotation = 0
@@ -95,17 +94,13 @@ task.spawn(function()
         statusText.Text = txt
     end
 
-    -- Fetch config
     local success, result = pcall(game.HttpGet, game, CONFIG_URL)
     if success and result then
         local config = HttpService:JSONDecode(result)
-        currentVersion = config.version
-        -- Update changelog on Dashboard (not shown here, but we can store it globally)
-        _G.ZeroHubChangelog = config.changelog
         _G.ZeroHubVersion = config.version
+        _G.ZeroHubChangelog = config.changelog
         updateBar(30, "Config loaded. v" .. config.version)
 
-        -- Now fetch the actual hub from the URL in config
         task.wait(0.3)
         updateBar(50, "Downloading ZeroHub...")
         local hubOk, hubResult = pcall(game.HttpGet, game, config.hub_url)
@@ -120,14 +115,14 @@ task.spawn(function()
             return
         end
     else
-        -- Fallback: try the old direct URL just in case
+        -- Fallback to direct GitHub link if config fails
         local fallbackUrl = "https://raw.githubusercontent.com/Zerohub0/ZH/main/Hub/zerohub.lua"
-        updateBar(20, "Config failed, trying direct...")
+        updateBar(20, "Config failed, using fallback...")
         local fbOk, fbResult = pcall(game.HttpGet, game, fallbackUrl)
         if fbOk and fbResult then
             hubScript = fbResult
-            _G.ZeroHubChangelog = "Direct load (no config)"
             _G.ZeroHubVersion = "unknown"
+            _G.ZeroHubChangelog = "Direct load (no config)"
         else
             updateBar(0, "Failed to load. Check network.")
             TweenService:Create(logo, TweenInfo.new(0.3), {TextColor3 = Color3.fromRGB(255,0,0)}):Play()
