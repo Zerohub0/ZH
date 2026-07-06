@@ -1,1 +1,1 @@
-local CURRENT_VERSION = _G.ZeroHubVersion or "3.3.0"
+3.3.0
