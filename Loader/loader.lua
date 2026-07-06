@@ -1,5 +1,5 @@
 -- ZeroHub Loader v6.0 | Remote config via npoint.io
-local CONFIG_URL = "https://api.npoint.io/e00fe3bb6747ca25eef5"
+local CONFIG_URL = "https://api.npoint.io/ddb0afe5e45666ec1974"
 
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
